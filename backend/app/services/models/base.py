@@ -74,7 +74,11 @@ class BaseService:
         :param filters: параметры поиска.
         :return: найденная или созданная запись.
         """
+
         existing_item = await self.find(filters, return_type=ReturnType.FIRST)
         if existing_item:
+            # print("QWE get_or_create get", existing_item, defaults, filters)
             return existing_item
-        return await self.create(**{**filters, **defaults})
+        r = await self.create(**{**filters, **defaults})
+        # print("QWE get_or_create create", r, defaults, filters)
+        return r

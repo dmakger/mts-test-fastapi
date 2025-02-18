@@ -12,6 +12,7 @@ class JobService(BaseService):
         """
         Создаёт или обновляет запись в таблицах `jobs` и `job_logs`.
         """
+        print("QWE", defaults)
         immutable_fields = {
             "employee_id": defaults["employee_id"],
             "employment_type_id": defaults["employment_type_id"],
@@ -34,6 +35,8 @@ class JobService(BaseService):
                 "head_id": defaults["head_id"],
             }
 
+            print("QWE existing_job", fields_to_check)
+
             for field, new_value in fields_to_check.items():
                 old_value = getattr(existing_job, field, None)
                 if old_value != new_value:
@@ -47,9 +50,11 @@ class JobService(BaseService):
                         "created_at": log_created_at
                     })
 
+            print("QWE updates", updates, logs)
+
             if updates:
                 await self.update(existing_job.id, updates)
                 for log in logs:
-                    await job_log_service.get_or_create(log)
+                    await job_log_service.get_or_create(log, **log)
         else:
-            await self.get_or_create(defaults)
+            await self.get_or_create(defaults, **defaults)
