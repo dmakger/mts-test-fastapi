@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-# from .api.v1 import employees, divisions, jobs, files
 from .api.v1 import files
+from .core.database import SessionLocal
+from .services.models import LevelService
 from .utils.logger import logger
 
 
@@ -23,6 +24,9 @@ app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
 
 @app.on_event("startup")
 async def startup():
+    async with SessionLocal() as session:
+        level_service = LevelService(session)
+        await level_service.initialize_levels()
     logger.info("API запущен")
 
 @app.get("/")

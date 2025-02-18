@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, TIMESTAMP
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from . import Base
 
 
 class JobLog(Base):

@@ -1,7 +1,7 @@
 from sqlalchemy import Index
 
-from backend.app.models.job import Job
-from backend.app.models.job_log import JobLog
+from . import Job
+from . import JobLog
 
 Index("idx_jobs_employee_id", Job.employee_id)
 Index("idx_jobs_position_id", Job.position_id)

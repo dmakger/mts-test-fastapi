@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, Date, DECIMAL
+from sqlalchemy import Column, Integer, ForeignKey, Date, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from . import Base
 
 
 class Job(Base):
@@ -16,12 +16,14 @@ class Job(Base):
     hire_date = Column(Date, nullable=False)
     dismissal_date = Column(Date)
     salary = Column(DECIMAL(10, 2), nullable=False)
+    created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
 
-    employee = relationship("Employee", back_populates="jobs")
-    employment_type = relationship("EmploymentType")
-    position = relationship("Position")
-    division = relationship("Division")
-    head = relationship("Employee", remote_side=[employee_id])
+    employee = relationship("Employee", back_populates="jobs", foreign_keys=[employee_id])
+    employment_type = relationship("EmploymentType", back_populates="jobs")
+    position = relationship("Position", back_populates="jobs")
+    division = relationship("Division", back_populates="jobs")
+    head = relationship("Employee", back_populates="head_jobs", foreign_keys=[head_id])
+    logs = relationship("JobLog", back_populates="job")
 
     def __repr__(self):
         return f"<Job(id={self.id}, employee_id={self.employee_id}, position_id={self.position_id}, salary={self.salary})>"

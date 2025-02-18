@@ -14,7 +14,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
+# add your models's MetaData object here
 target_metadata = Base.metadata
 
 
@@ -30,12 +30,13 @@ async def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
 
-    # асинхронно запускаем миграции
+    # Асинхронно запускаем миграции
     async with connectable.connect() as connection:
+        # Используем run_sync для выполнения синхронных операций
         await connection.run_sync(do_run_migrations)
 
 
-async def do_run_migrations(connection) -> None:
+def do_run_migrations(connection) -> None:
     """Run migrations in sync mode on an async connection."""
     context.configure(
         connection=connection, target_metadata=target_metadata
