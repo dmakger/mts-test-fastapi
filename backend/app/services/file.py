@@ -60,7 +60,7 @@ class FileService:
         """Обрабатывает одну строку из Excel-файла, обновляя `jobs` и `job_logs`"""
 
         head_id = None
-        if isinstance(row["head"], float) and not math.isnan(row["head"]):
+        if row.get("head") and isinstance(row["head"], str):
             head = await employee_service.get_or_create({"fio": row["head"]}, **{"fio": row["head"]})
             head_id = head.id
 
