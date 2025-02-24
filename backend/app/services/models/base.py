@@ -1,9 +1,18 @@
+from typing import TypeVar, Union, Dict
+
+from pydantic import BaseModel
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from enum import Enum
 
+# Тип для схемы фильтрации
+FilterType = TypeVar("FilterType", bound=BaseModel)
+
 
 class ReturnType(Enum):
+    """
+    Тип возврата данных
+    """
     ALL = "all"
     FIRST = "first"
     LAST = "last"
@@ -14,18 +23,24 @@ class BaseService:
         self.session = session
         self.model = model
 
-    async def find(self, filters: dict, return_type: ReturnType = ReturnType.ALL):
+    async def find(
+            self, filters: Union[FilterType, Dict], return_type: ReturnType = ReturnType.ALL
+    ):
         """
-        Универсальный метод поиска записей.
+        Универсальный метод поиска записей с фильтрацией.
 
-        :param filters: словарь с параметрами поиска (игнорируются None).
+        :param filters: объект Pydantic или словарь с параметрами.
         :param return_type: ReturnType.ALL - все записи, ReturnType.FIRST - первая, ReturnType.LAST - последняя.
         :return: список, одна запись или None.
         """
-        stmt = select(self.model)
+        # Если передан объект Pydantic, превращаем в словарь
+        if isinstance(filters, BaseModel):
+            filters = filters.dict(exclude_unset=True)
+
+        stmt = select(self.model).limit(filters.get('limit', 10)).offset(filters.get('offset', 0))
 
         for key, value in filters.items():
-            if value is not None:
+            if key not in ('limit', 'offset') and value is not None:
                 stmt = stmt.where(getattr(self.model, key) == value)
 
         if return_type == ReturnType.FIRST:
