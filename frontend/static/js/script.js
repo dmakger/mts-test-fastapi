@@ -1,7 +1,7 @@
 $(document).ready(function() {
     // Инициализация Tabs
     $("#tabs").tabs({
-        active: 1
+        active: 0
     });
 
     // Инициализация DatePicker
@@ -16,7 +16,7 @@ $(document).ready(function() {
     // Запрос на получение данных сотрудников
     async function fetchEmployeesData(reportDate = null, divisions = []) {
         try {
-            const url = new URL("http://localhost:8000/api/v1/employees/all"); // Убедитесь, что это правильный URL вашего API
+            const url = new URL("http://localhost:8000/api/v1/employees/all");
             const params = new URLSearchParams();
 
             if (reportDate) {
@@ -64,8 +64,10 @@ $(document).ready(function() {
                     { data: 'fio' },
                     { data: 'position' },
                     { data: 'division' },
+                    { data: 'head' },
                     { data: 'hire_date' },
                     { data: 'dismissal_date' },
+                    { data: 'employment_type' },
                     { data: 'salary' }
                 ]
             });

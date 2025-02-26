@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from .api.v1 import files, employees
+from .api.v1 import files, employees, jobs
 from .core.database import SessionLocal
 from .services.models import LevelService
 from .utils.logger import logger
@@ -18,6 +18,7 @@ app.add_middleware(
 # Подключаем роуты
 app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
 app.include_router(employees.router, prefix="/api/v1/employees", tags=["Employees"])
+app.include_router(jobs.router, prefix="/api/v1/jobs", tags=["Jobs"])
 
 
 @app.on_event("startup")

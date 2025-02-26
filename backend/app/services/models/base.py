@@ -52,9 +52,8 @@ class BaseService:
             result = await self.session.execute(stmt)
             return result.scalars().first()
 
-        else:
-            result = await self.session.execute(stmt)
-            return result.scalars().all()
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
     async def update(self, item_id: int, updates: dict):
         """
