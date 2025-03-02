@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...core.database import get_db
-from ...schemas import JobFilterSchema, JobResponse
+from ...schemas import JobFilterSchema, JobSerializerResponse
 from ...services.models import JobService
 
 router = APIRouter()
@@ -16,7 +16,7 @@ def get_job_service(db: AsyncSession = Depends(get_db)) -> JobService:
 
 
 # Получаем список сотрудников
-@router.get("/all", response_model=List[JobResponse])
+@router.get("/all", response_model=List[JobSerializerResponse])
 async def get_jobs(
         filters: JobFilterSchema = Depends(),
         job_service: JobService = Depends(get_job_service)

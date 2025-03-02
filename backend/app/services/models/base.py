@@ -40,7 +40,7 @@ class BaseService:
         stmt = select(self.model).limit(filters.get('limit', 10)).offset(filters.get('offset', 0))
 
         for key, value in filters.items():
-            if key not in ('limit', 'offset') and value is not None:
+            if key not in ('limit', 'offset', 'serialize') and value is not None:
                 stmt = stmt.where(getattr(self.model, key) == value)
 
         if return_type == ReturnType.FIRST:
