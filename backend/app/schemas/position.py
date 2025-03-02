@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import Field, BaseModel
 
-from . import BaseFilterSchema
+from . import BaseFilterSchema, LevelResponse
 
 
 class PositionFilterSchema(BaseFilterSchema):
@@ -23,3 +23,17 @@ class PositionResponse(BaseModel):
 
     class Config:
         from_attributes = True  # Для совместимости с SQLAlchemy
+
+
+class PositionSerializerResponse(BaseModel):
+    """
+    Схема ответа для модели `Position` из таблицы `positions` с данными из связанных таблиц.
+    Сериализированная модель. Каждый `FK` является объектом
+    """
+    id: int
+    level: LevelResponse
+    name: str
+
+    class Config:
+        from_attributes = True  # Для совместимости с SQLAlchemy
+
