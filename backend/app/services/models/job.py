@@ -2,11 +2,51 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import BaseService, ReturnType
 from ...models import Job
+from ...schemas import JobBaseResponse, JobResponse, JobSerializerResponse, EmployeeResponse, EmploymentTypeResponse, \
+    PositionSerializerResponse, DivisionSerializerResponse
 
 
 class JobService(BaseService):
+    # Указываем список отношений, которые нужно догружать при serialize=True
+    relationships = [
+        Job.employee,
+        Job.employment_type,
+        Job.position,
+        Job.division,
+        Job.head
+    ]
+
     def __init__(self, session: AsyncSession):
         super().__init__(session, Job)
+
+    # ========={ ОБЯЗАТЕЛЬНЫЕ ДЛЯ ПЕРЕОПРЕДЕЛЕНИЯ }=========
+    def _to_base_response(self, item) -> JobBaseResponse:
+        return JobBaseResponse.model_validate(item)
+
+    def _to_basic_response(self, item) -> JobResponse:
+        base_response = self._to_base_response(item)
+        return JobResponse(
+            **base_response.model_dump(),
+            employee_id=item.employee_id,
+            employment_type_id=item.employment_type_id,
+            position_id=item.position_id,
+            division_id=item.division_id,
+            head_id=item.head_id
+        )
+
+    def _to_serialized_response(self, item) -> JobSerializerResponse:
+        base_response = self._to_base_response(item)
+        return JobSerializerResponse(
+            **base_response.model_dump(),
+            employee=EmployeeResponse.model_validate(item.employee) if item.employee else None,
+            employment_type=EmploymentTypeResponse.model_validate(
+                item.employment_type) if item.employment_type else None,
+            position=PositionSerializerResponse.model_validate(item.position) if item.position else None,
+            division=DivisionSerializerResponse.model_validate(item.division) if item.division else None,
+            head=EmployeeResponse.model_validate(item.head) if item.head else None
+        )
+
+    # ========={ ОБЩИЕ }=========
 
     async def create_smart(self, defaults: dict, job_log_service):
         """
@@ -38,7 +78,8 @@ class JobService(BaseService):
                 old_value = getattr(existing_job, field, None)
                 if old_value != new_value:
                     updates[field] = new_value
-                    log_created_at = defaults["created_at"] if old_dismissal_date and not new_dismissal_date else new_dismissal_date
+                    log_created_at = defaults[
+                        "created_at"] if old_dismissal_date and not new_dismissal_date else new_dismissal_date
                     logs.append({
                         "job_id": existing_job.id,
                         "column_name": field,
@@ -53,6 +94,3 @@ class JobService(BaseService):
                     await job_log_service.get_or_create(log, **log)
         else:
             await self.get_or_create(defaults, **defaults)
-
-
-

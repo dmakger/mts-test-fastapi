@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Depends
 
-from ...schemas.file import FileUploadResponse
+from ...schemas import FileUploadResponse
 from ...services.file import FileService
 
 router = APIRouter()
