@@ -19,11 +19,13 @@ def get_job_service(db: AsyncSession = Depends(get_db)) -> JobService:
 @router.get("/all", response_model=List[JobSerializerResponse | JobResponse])
 async def get_jobs(
         filters: JobFilterSchema = Depends(),
-        job_service: JobService = Depends(get_job_service)
+        # job_service: JobService = Depends(get_job_service)
+        db: AsyncSession = Depends(get_db)
 ):
     """
     Получение всех записей о работе из таблицы `jobs`
     """
+    job_service = JobService(db)
     response_format = ResponseFormat.SERIALIZED if filters.model_dump(exclude_unset=True).get('serialize', False) else ResponseFormat.BASIC
     print("!!! API response_format", response_format)
     jobs_data = await job_service.find(filters, ReturnType.ALL, response_format=response_format)

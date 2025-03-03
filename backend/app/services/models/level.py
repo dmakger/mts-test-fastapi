@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import BaseService
 from ...models import Level
+from ...schemas import LevelBaseResponse, LevelResponse, LevelSerializerResponse
 
 DEFAULT_LEVELS = [
     {"name": "Департамент", "level": 1},
@@ -13,6 +14,19 @@ DEFAULT_LEVELS = [
 class LevelService(BaseService):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Level)
+
+    # ///====={ ОБЯЗАТЕЛЬНЫЕ ДЛЯ ПЕРЕОПРЕДЕЛЕНИЯ }======\\\
+    def _to_base_response(self, item) -> LevelBaseResponse:
+        return LevelBaseResponse.model_validate(item)
+
+    def _to_basic_response(self, item) -> LevelResponse:
+        base_response = self._to_base_response(item)
+        return LevelResponse(**base_response.model_dump())
+
+    def _to_serialized_response(self, item) -> LevelSerializerResponse:
+        base_response = self._to_base_response(item)
+        return LevelSerializerResponse(**base_response.model_dump())
+    # \\\====={ ОБЯЗАТЕЛЬНЫЕ ДЛЯ ПЕРЕОПРЕДЕЛЕНИЯ }======///
 
     async def initialize_levels(self):
         """Добавляет начальные уровни, если они отсутствуют"""

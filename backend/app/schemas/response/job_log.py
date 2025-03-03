@@ -26,7 +26,7 @@ class JobLogResponse(JobLogBaseResponse):
     job_id: str = Field(..., description="ID `job` из `jobs`")
 
 
-class JobLogSerializeResponse(JobLogBaseResponse):
+class JobLogSerializerResponse(JobLogBaseResponse):
     """
     Схема ответа для модели `JobLog` из таблицы `job_logs`;
     Сериализированная модель. Каждый `FK` является объектом

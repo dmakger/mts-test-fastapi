@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from . import BaseService, ReturnType
+from . import BaseService, ReturnType, EmployeeService, EmploymentTypeService, PositionService, DivisionService
 from ...models import Job
 from ...schemas import JobBaseResponse, JobResponse, JobSerializerResponse, EmployeeResponse, EmploymentTypeResponse, \
     PositionSerializerResponse, DivisionSerializerResponse
@@ -18,6 +18,10 @@ class JobService(BaseService):
 
     def __init__(self, session: AsyncSession):
         super().__init__(session, Job)
+        self.employee_service = EmployeeService(session)
+        self.employment_type_service = EmploymentTypeService(session)
+        self.position_service = PositionService(session)
+        self.division_service = DivisionService(session)
 
     # ========={ ОБЯЗАТЕЛЬНЫЕ ДЛЯ ПЕРЕОПРЕДЕЛЕНИЯ }=========
     def _to_base_response(self, item) -> JobBaseResponse:
@@ -36,14 +40,14 @@ class JobService(BaseService):
 
     def _to_serialized_response(self, item) -> JobSerializerResponse:
         base_response = self._to_base_response(item)
+        print("JOB _to_serialized_response", item)
         return JobSerializerResponse(
             **base_response.model_dump(),
-            employee=EmployeeResponse.model_validate(item.employee) if item.employee else None,
-            employment_type=EmploymentTypeResponse.model_validate(
-                item.employment_type) if item.employment_type else None,
-            position=PositionSerializerResponse.model_validate(item.position) if item.position else None,
-            division=DivisionSerializerResponse.model_validate(item.division) if item.division else None,
-            head=EmployeeResponse.model_validate(item.head) if item.head else None
+            employee=self.employee_service._to_serialized_response(item.employee),
+            employment_type=self.employment_type_service._to_serialized_response(item.employment_type),
+            position=self.position_service._to_serialized_response(item.position),
+            division=self.division_service._to_serialized_response(item.division),
+            head=self.employee_service._to_serialized_response(item.head),
         )
 
     # ========={ ОБЩИЕ }=========

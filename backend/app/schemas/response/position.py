@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from . import LevelResponse
+from . import LevelSerializerResponse
 
 
 class PositionBaseResponse(BaseModel):
@@ -18,7 +18,7 @@ class PositionResponse(PositionBaseResponse):
     """
     Схема ответа для модели `Position` из таблицы `positions`.
     """
-    level_id: str
+    level_id: int
 
 
 class PositionSerializerResponse(PositionBaseResponse):
@@ -26,4 +26,4 @@ class PositionSerializerResponse(PositionBaseResponse):
     Схема ответа для модели `Position` из таблицы `positions` с данными из связанных таблиц.
     Сериализированная модель. Каждый `FK` является объектом
     """
-    level: LevelResponse
+    level: LevelSerializerResponse
